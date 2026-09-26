@@ -1,0 +1,449 @@
+.orders {
+  max-width: 1050px;
+  margin: 2.5rem auto;
+  padding: 2.5rem;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  color: #1E293B;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.header-nav {
+  margin-bottom: 1.5rem;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #64748B;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.back-link:hover {
+  color: #2563EB;
+}
+
+.orders-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #E2E8F0;
+  padding-bottom: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.orders h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+  color: #1E293B;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: 0.925rem;
+  color: #64748B;
+  margin: 0.35rem 0 0;
+}
+
+.header-badge {
+  background: #F1F5F9;
+  border: 1px solid #E2E8F0;
+  padding: 0.45rem 1rem;
+  border-radius: 2rem;
+  font-size: 0.85rem;
+  color: #64748B;
+}
+
+.header-badge strong {
+  color: #2563EB;
+}
+
+.feedback-banner {
+  background: #EFF6FF;
+  border-left: 4px solid #2563EB;
+  color: #1D4ED8;
+  padding: 0.85rem 1.25rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Caja de Creación de Pedidos */
+.create-order-box {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.create-order-box h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1E293B;
+  margin: 0 0 1rem;
+}
+
+.input-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+  min-width: 150px;
+}
+
+.flex-2 {
+  flex: 2;
+  min-width: 240px;
+}
+
+.form-group label {
+  font-size: 0.775rem;
+  font-weight: 600;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+input, .custom-select {
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 0.5rem;
+  padding: 0.65rem 0.9rem;
+  color: #1E293B;
+  font-size: 0.925rem;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus, .custom-select:focus {
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.total-group {
+  min-width: 130px;
+}
+
+.total-badge {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1D4ED8;
+  padding: 0.65rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-family: monospace;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  box-sizing: border-box;
+}
+
+.btn-create {
+  background: #2563EB;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.65rem 1.4rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+  height: 40px;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.2);
+}
+
+.btn-create:hover {
+  background: #1D4ED8;
+  box-shadow: 0 3px 8px rgba(37, 99, 235, 0.35);
+}
+
+/* Aviso informativo para rol Cliente (sin permiso de creación) */
+.client-order-notice {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  border-left: 4px solid #16A34A;
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.notice-icon {
+  font-size: 1.8rem;
+}
+
+.notice-info h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #15803D;
+  margin: 0 0 0.25rem;
+}
+
+.notice-info p {
+  font-size: 0.85rem;
+  color: #475569;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.notice-info strong {
+  color: #1E293B;
+}
+
+/* Tabla de Pedidos */
+.table-container {
+  overflow-x: auto;
+  border-radius: 0.75rem;
+  border: 1px solid #E2E8F0;
+  background: #FFFFFF;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+th {
+  background: #F8FAFC;
+  padding: 0.85rem 1.25rem;
+  font-size: 0.775rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748B;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #F1F5F9;
+  font-size: 0.925rem;
+  color: #334155;
+  vertical-align: middle;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background: #F8FAFC;
+}
+
+.col-id {
+  font-family: monospace;
+  font-weight: 700;
+  color: #1E293B;
+}
+
+/* Semántica de Estados del Pedido */
+.status-pill {
+  display: inline-block;
+  padding: 0.3rem 0.75rem;
+  border-radius: 2rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-width: 1px;
+  border-style: solid;
+}
+
+/* CREADO: Gris #94A3B8 */
+.status-pill.status-creado {
+  background: #F1F5F9;
+  color: #64748B;
+  border-color: #CBD5E1;
+}
+
+/* ACEPTADO: Azul #3B82F6 */
+.status-pill.status-aceptado {
+  background: #EFF6FF;
+  color: #2563EB;
+  border-color: #BFDBFE;
+}
+
+/* EN_PREPARACIÓN: Ámbar #F59E0B */
+.status-pill.status-en_preparacion {
+  background: #FFFBEB;
+  color: #D97706;
+  border-color: #FDE68A;
+}
+
+/* DESPACHADO: Púrpura #8B5CF6 */
+.status-pill.status-despachado {
+  background: #F5F3FF;
+  color: #7C3AED;
+  border-color: #DDD6FE;
+}
+
+/* ENTREGADO: Verde #22C55E */
+.status-pill.status-entregado {
+  background: #F0FDF4;
+  color: #16A34A;
+  border-color: #BBF7D0;
+}
+
+/* CANCELADO: Rojo #EF4444 */
+.status-pill.status-cancelado {
+  background: #FEF2F2;
+  color: #DC2626;
+  border-color: #FECACA;
+}
+
+/* Detalle de Items del Pedido */
+.order-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.order-item-badge {
+  display: inline-block;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  padding: 0.25rem 0.55rem;
+  border-radius: 0.4rem;
+  font-size: 0.8rem;
+  font-family: monospace;
+  color: #334155;
+}
+
+.text-muted {
+  color: #94A3B8;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+/* Acciones y Botones del Operador */
+.actions-cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.status-btn-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.btn-action {
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.45rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+/* Botón Aceptar: Azul #3B82F6 */
+.btn-accept {
+  background: #EFF6FF;
+  color: #2563EB;
+  border-color: #BFDBFE;
+}
+.btn-accept:hover {
+  background: #2563EB;
+  color: #FFFFFF;
+}
+
+/* Botón Preparar: Ámbar #F59E0B */
+.btn-prep {
+  background: #FFFBEB;
+  color: #D97706;
+  border-color: #FDE68A;
+}
+.btn-prep:hover {
+  background: #D97706;
+  color: #FFFFFF;
+}
+
+/* Botón Despachar: Púrpura #8B5CF6 */
+.btn-dispatch {
+  background: #F5F3FF;
+  color: #7C3AED;
+  border-color: #DDD6FE;
+}
+.btn-dispatch:hover {
+  background: #7C3AED;
+  color: #FFFFFF;
+}
+
+/* Botón Entregar: Verde #22C55E */
+.btn-deliver {
+  background: #F0FDF4;
+  color: #16A34A;
+  border-color: #BBF7D0;
+}
+.btn-deliver:hover {
+  background: #16A34A;
+  color: #FFFFFF;
+}
+
+/* Botón Cancelar: Rojo #EF4444 */
+.btn-cancel {
+  background: #FEF2F2;
+  color: #DC2626;
+  border-color: #FECACA;
+}
+.btn-cancel:hover {
+  background: #DC2626;
+  color: #FFFFFF;
+}
+
+.client-note {
+  font-size: 0.825rem;
+  color: #16A34A;
+  font-weight: 600;
+}
+
+.admin-note {
+  font-size: 0.8rem;
+  color: #D97706;
+  font-weight: 600;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3.5rem 1.5rem;
+  color: #94A3B8;
+}
+
+.empty-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}

@@ -1,0 +1,103 @@
+<div class="catalog">
+  <div class="header-nav">
+    <a routerLink="/dashboard" class="back-link">
+      <span class="arrow">←</span> Volver al Dashboard
+    </a>
+  </div>
+
+  <div class="catalog-header">
+    <div>
+      <h1>Catálogo de Productos</h1>
+      <p class="subtitle">Inventario central y precios administrados en la nube</p>
+    </div>
+    <div class="header-badge">
+      Items: <strong>{{ products.length }}</strong>
+    </div>
+  </div>
+
+  <div *ngIf="feedbackMessage" class="feedback-banner">
+    {{ feedbackMessage }}
+  </div>
+
+  <!-- Crear producto: solo ADMIN (y operario con permiso específico si configurado) -->
+  <div *ngIf="authService.isAdmin()" class="create-product-box">
+    <h3>Nuevo Producto</h3>
+    <div class="input-row">
+      <div class="form-group flex-2">
+        <label>Nombre del Producto</label>
+        <input [(ngModel)]="nuevoProducto.nombre" placeholder="Ej. Laptop Dell Precision 5570">
+      </div>
+      <div class="form-group">
+        <label>Precio ($ CLP)</label>
+        <input type="number" [(ngModel)]="nuevoProducto.precio" placeholder="1450000" min="1" step="100">
+      </div>
+      <div class="form-group">
+        <label>Stock inicial</label>
+        <input type="number" [(ngModel)]="nuevoProducto.stock" placeholder="15" min="0">
+      </div>
+      <button (click)="crearProducto()" class="btn-add">
+        <span>+</span> Crear Producto
+      </button>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Precio</th>
+          <th>Stock</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of products">
+          <td class="col-id">#{{ p.id }}</td>
+          <td class="col-name">{{ p.nombre }}</td>
+          <td class="col-price">{{ p.precio | currency:'CLP':'$':'1.0-0' }}</td>
+          <td>
+            <div class="stock-control">
+              <button 
+                *ngIf="authService.isOperador() || authService.isAdmin()"
+                (click)="ajustarStock(p, -1)" 
+                class="btn-stock-adjust"
+                title="Disminuir stock"
+                [disabled]="p.stock <= 0">-</button>
+              <span class="stock-pill" [class.low-stock]="p.stock < 5">
+                {{ p.stock }} unid.
+              </span>
+              <button 
+                *ngIf="authService.isOperador() || authService.isAdmin()"
+                (click)="ajustarStock(p, 1)" 
+                class="btn-stock-adjust"
+                title="Aumentar stock">+</button>
+            </div>
+          </td>
+          <td class="actions-cell">
+            <!-- Admin: Eliminar producto -->
+            <button *ngIf="authService.isAdmin()" (click)="eliminarProducto(p.id!)" class="btn-delete" title="Eliminar producto">
+              Eliminar
+            </button>
+            <!-- Admin u Operador: Crear orden con este producto -->
+            <button *ngIf="authService.isAdmin() || authService.isOperador()" (click)="pedirProducto(p)" class="btn-order-now">
+              📦 Ordenar item
+            </button>
+            <!-- Cliente o Invitado: Modo Consulta / Catálogo -->
+            <span *ngIf="!authService.isAdmin() && !authService.isOperador()" class="badge-consult">
+              Disponible
+            </span>
+          </td>
+        </tr>
+        <tr *ngIf="products.length === 0">
+          <td colspan="5" class="empty-state">
+            <div class="empty-icon">📋</div>
+            <p>No hay productos registrados en el catálogo.</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+

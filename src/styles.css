@@ -1,4 +1,63 @@
-/* Global styles */
+/* Google Font Inter */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* Paleta Corporativa B2B */
+  --primary: #2563EB;
+  --primary-hover: #1D4ED8;
+  --primary-light: #EFF6FF;
+  --primary-border: #BFDBFE;
+
+  /* Fondos y Superficies */
+  --bg-page: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-muted: #F1F5F9;
+
+  /* Tipografía y Textos */
+  --text-main: #1E293B;
+  --text-secondary: #64748B;
+  --text-muted: #94A3B8;
+
+  /* Bordes y Separadores */
+  --border-light: #E2E8F0;
+  --border-input: #CBD5E1;
+
+  /* Colores Semánticos de Estados del Pedido */
+  --status-creado-bg: #F1F5F9;
+  --status-creado-text: #64748B;
+  --status-creado-border: #CBD5E1;
+
+  --status-aceptado-bg: #EFF6FF;
+  --status-aceptado-text: #2563EB;
+  --status-aceptado-border: #BFDBFE;
+
+  --status-preparacion-bg: #FFFBEB;
+  --status-preparacion-text: #D97706;
+  --status-preparacion-border: #FDE68A;
+
+  --status-despachado-bg: #F5F3FF;
+  --status-despachado-text: #7C3AED;
+  --status-despachado-border: #DDD6FE;
+
+  --status-entregado-bg: #F0FDF4;
+  --status-entregado-text: #16A34A;
+  --status-entregado-border: #BBF7D0;
+
+  --status-cancelado-bg: #FEF2F2;
+  --status-cancelado-text: #DC2626;
+  --status-cancelado-border: #FECACA;
+
+  /* Diferenciación por Rol */
+  --role-admin: #D97706;
+  --role-operador: #2563EB;
+  --role-cliente: #16A34A;
+
+  /* Sombras */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -6,8 +65,11 @@
 }
 
 body {
-  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-  background-color: #0f172a;
-  color: #f8fafc;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-page);
+  color: var(--text-main);
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+

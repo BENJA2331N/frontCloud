@@ -6,7 +6,8 @@ export function msalInstanceFactory(): IPublicClientApplication {
     auth: {
       clientId: environment.azure.clientId,
       authority: environment.azure.authority,
-      redirectUri: environment.azure.redirectUri
+      redirectUri: environment.azure.redirectUri,
+      postLogoutRedirectUri: environment.azure.postLogoutRedirectUri
     },
     cache: {
       cacheLocation: 'localStorage'

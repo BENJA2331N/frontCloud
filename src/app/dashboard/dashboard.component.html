@@ -1,0 +1,72 @@
+<div class="dashboard">
+  <header class="dashboard-header">
+    <div class="user-badge">
+      <div class="avatar">
+        {{ authService.isLoggedIn() ? nombreUsuario.charAt(0).toUpperCase() : 'C' }}
+      </div>
+      <div>
+        <h1>{{ authService.isLoggedIn() ? 'Bienvenido, ' + nombreUsuario : 'Bienvenido a Pedidos360 Cloud' }}</h1>
+        <p class="subtitle">
+          {{ authService.isLoggedIn() ? 'Sesión autenticada mediante Microsoft Entra ID' : 'Portal Público de Productos y Catálogo Cloud' }}
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <div class="panels-container">
+    <!-- Panel Administrador (Solo si está logueado como ADMIN) -->
+    <div *ngIf="authService.isLoggedIn() && authService.isAdmin()" class="panel-card admin-card">
+      <div class="panel-icon">🛡️</div>
+      <div class="panel-body">
+        <h2>Panel Administrador</h2>
+        <p>Control centralizado: alta de productos en el catálogo, auditoría global y creación de pedidos corporativos.</p>
+      </div>
+      <span class="role-pill pill-admin">ADMIN</span>
+    </div>
+
+    <!-- Panel Operador (Solo si está logueado como OPERADOR) -->
+    <div *ngIf="authService.isLoggedIn() && authService.isOperador()" class="panel-card operator-card">
+      <div class="panel-icon">⚡</div>
+      <div class="panel-body">
+        <h2>Panel Operador</h2>
+        <p>Gestión operativa: administración de stock, control total de pedidos y actualización de estados del flujo.</p>
+      </div>
+      <span class="role-pill pill-operator">OPERADOR</span>
+    </div>
+
+    <!-- Panel Cliente (Si está logueado como CLIENTE o en modo visitante) -->
+    <div *ngIf="!authService.isLoggedIn() || authService.isCliente()" class="panel-card client-card">
+      <div class="panel-icon">🛒</div>
+      <div class="panel-body">
+        <h2>Panel Cliente {{ !authService.isLoggedIn() ? '(Modo Consulta)' : '' }}</h2>
+        <p>
+          {{ !authService.isLoggedIn() 
+              ? 'Explora el catálogo de productos disponible. Para gestionar pedidos o administrar el sistema, inicia sesión con tu cuenta Microsoft.' 
+              : 'Portal cliente: consulta el catálogo y revisa el seguimiento de tus pedidos en tiempo real.' }}
+        </p>
+      </div>
+      <span class="role-pill pill-client">CLIENTE</span>
+    </div>
+  </div>
+
+  <nav class="nav-actions">
+    <!-- Enlaces según estado de autenticación -->
+    <a routerLink="/catalog" class="btn btn-secondary">
+      <span class="btn-icon">📋</span> Ver Catálogo
+    </a>
+
+    <a *ngIf="authService.isLoggedIn()" routerLink="/orders" class="btn btn-primary">
+      <span class="btn-icon">📦</span> {{ authService.isOperador() ? 'Gestionar Pedidos' : 'Mis Pedidos' }}
+    </a>
+
+    <button *ngIf="!authService.isLoggedIn()" (click)="authService.login()" class="btn btn-primary">
+      <span class="btn-icon">🔐</span> Iniciar Sesión con Microsoft
+    </button>
+
+    <button *ngIf="authService.isLoggedIn()" (click)="authService.logout()" class="btn btn-logout">
+      <span class="btn-icon">🚪</span> Cerrar sesión
+    </button>
+  </nav>
+</div>
+
+

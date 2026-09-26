@@ -1,0 +1,164 @@
+<div class="orders">
+  <div class="header-nav">
+    <a routerLink="/dashboard" class="back-link">
+      <span class="arrow">←</span> Volver al Dashboard
+    </a>
+  </div>
+
+  <div class="orders-header">
+    <div>
+      <h1>Gestión de Pedidos</h1>
+      <p class="subtitle">
+        {{ authService.isOperador() ? 'Supervisión y control de todas las órdenes en el sistema' : 'Seguimiento en tiempo real de tus pedidos' }}
+      </p>
+    </div>
+    <div class="header-badge">
+      Órdenes: <strong>{{ orders.length }}</strong>
+    </div>
+  </div>
+
+  <div *ngIf="feedbackMessage" class="feedback-banner">
+    {{ feedbackMessage }}
+  </div>
+
+  <!-- Crear nuevo pedido: solo ADMIN y OPERADOR según requerimiento -->
+  <div *ngIf="canCreateOrder" class="create-order-box">
+    <h3>Crear Nuevo Pedido</h3>
+    
+    <div class="input-row">
+      <!-- Selector inteligente desde el Catálogo -->
+      <div class="form-group flex-2">
+        <label>Seleccionar Producto</label>
+        <select 
+          class="custom-select" 
+          [ngModel]="nuevoProductoId" 
+          (ngModelChange)="onProductSelected($event)">
+          <option [ngValue]="0" disabled>-- Elige un producto del catálogo --</option>
+          <option *ngFor="let p of products" [ngValue]="p.id">
+            #{{ p.id }} - {{ p.nombre }} ({{ p.precio | currency:'CLP':'$':'1.0-0' }}) [Stock: {{ p.stock }}]
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Cantidad</label>
+        <input 
+          type="number" 
+          [(ngModel)]="nuevaCantidad" 
+          placeholder="1" 
+          min="1" 
+          [max]="selectedProduct?.stock || 999">
+      </div>
+
+      <div class="form-group">
+        <label>Precio Unitario ($ CLP)</label>
+        <input 
+          type="number" 
+          [(ngModel)]="nuevoPrecioUnitario" 
+          placeholder="1450000" 
+          min="1" 
+          step="100">
+      </div>
+
+      <div class="form-group total-group">
+        <label>Total Estimado</label>
+        <div class="total-badge">
+          {{ totalCalculado | currency:'CLP':'$':'1.0-0' }}
+        </div>
+      </div>
+
+      <button (click)="crearPedido()" class="btn-create">
+        <span>+</span> Crear Pedido
+      </button>
+    </div>
+  </div>
+
+  <!-- Aviso informativo para rol Cliente (sin permiso de creación) -->
+  <div *ngIf="!canCreateOrder" class="client-order-notice">
+    <div class="notice-icon">📋</div>
+    <div class="notice-info">
+      <h4>Portal de Pedidos — Modo Consulta Cliente</h4>
+      <p>La creación de órdenes está restringida a personal autorizado (<strong>Operador</strong> y <strong>Administrador</strong>). Aquí puedes consultar el historial y estado de tus compras.</p>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th># Orden</th>
+          <th>Estado</th>
+          <th>Detalles del Pedido</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of orders">
+          <td class="col-id">#{{ order.id }}</td>
+          <td>
+            <span class="status-pill" [ngClass]="getStatusClass(order.estado)">
+              {{ formatStatus(order.estado) }}
+            </span>
+          </td>
+          <td>
+            <div *ngIf="order.items && order.items.length > 0" class="order-items-list">
+              <span *ngFor="let it of order.items" class="order-item-badge">
+                Prod #{{ it.productoId }} × {{ it.cantidad }} ({{ it.precioUnitario | currency:'CLP':'$':'1.0-0' }})
+              </span>
+            </div>
+            <span *ngIf="!order.items || order.items.length === 0" class="text-muted">
+              Sin items especificados
+            </span>
+          </td>
+          <td class="actions-cell">
+            <!-- Operador: puede cambiar estados según el ciclo de vida -->
+            <div *ngIf="authService.isOperador()" class="status-btn-group">
+              <button 
+                *ngIf="order.estado === 'PENDIENTE' || order.estado === 'CREADO' || !order.estado"
+                class="btn-action btn-accept" 
+                (click)="cambiarEstado(order.id!, 'ACEPTADO')"
+                title="Aceptar orden">Aceptar</button>
+              <button 
+                *ngIf="order.estado === 'ACEPTADO'"
+                class="btn-action btn-prep" 
+                (click)="cambiarEstado(order.id!, 'EN_PREPARACION')"
+                title="Comenzar preparación">Preparar</button>
+              <button 
+                *ngIf="order.estado === 'EN_PREPARACION' || order.estado === 'EN_PREPARACIÓN'"
+                class="btn-action btn-dispatch" 
+                (click)="cambiarEstado(order.id!, 'DESPACHADO')"
+                title="Despachar pedido">Despachar</button>
+              <button 
+                *ngIf="order.estado === 'DESPACHADO'"
+                class="btn-action btn-deliver" 
+                (click)="cambiarEstado(order.id!, 'ENTREGADO')"
+                title="Confirmar entrega">Entregar</button>
+              <button 
+                *ngIf="order.estado !== 'ENTREGADO' && order.estado !== 'CANCELADO'"
+                class="btn-action btn-cancel" 
+                (click)="cambiarEstado(order.id!, 'CANCELADO')"
+                title="Cancelar pedido">Cancelar</button>
+            </div>
+
+            <!-- Cliente: sólo seguimiento -->
+            <span *ngIf="authService.isCliente()" class="client-note">
+              {{ order.estado === 'ENTREGADO' ? '✅ Entregado' : '🚚 En seguimiento' }}
+            </span>
+
+            <!-- Admin: auditoría -->
+            <span *ngIf="authService.isAdmin() && !authService.isOperador()" class="admin-note">
+              👁️ Solo lectura (Auditoría)
+            </span>
+          </td>
+        </tr>
+        <tr *ngIf="orders.length === 0">
+          <td colspan="4" class="empty-state">
+            <div class="empty-icon">📦</div>
+            <p>No hay pedidos registrados en este momento.</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
