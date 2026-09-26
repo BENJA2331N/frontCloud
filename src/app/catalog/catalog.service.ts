@@ -26,7 +26,7 @@ export class CatalogService {
   update(id: number, product: Product) {
     return this.http.put<Product>(`${this.baseUrl}/${id}`, product);
   }
-  1
+
   delete(id: number) {
     return this.http.delete(`${this.baseUrl}/${id}`);
   }
