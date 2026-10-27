@@ -13,6 +13,11 @@
     </div>
   </header>
 
+  <section *ngIf="authService.isLoggedIn()" class="claims-box">
+    <p><strong>Roles (claim roles):</strong> {{ authService.getRoles().join(', ') }}</p>
+    <p><strong>Scopes (claim scp):</strong> {{ scopes().length > 0 ? scopes().join(', ') : 'sin scopes' }}</p>
+  </section>
+
   <div class="panels-container">
     <!-- Panel Administrador (Solo si está logueado como ADMIN) -->
     <div *ngIf="authService.isLoggedIn() && authService.isAdmin()" class="panel-card admin-card">

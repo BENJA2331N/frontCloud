@@ -9,7 +9,7 @@ import { roleGuard } from './guards/role.guard';
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'dashboard', component: DashboardComponent },
-  { path: 'catalog', component: CatalogComponent },
+  { path: 'catalog', component: CatalogComponent, canActivate: [MsalGuard] },
   { path: 'orders', component: OrdersComponent, canActivate: [MsalGuard] },
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: '/dashboard' }
