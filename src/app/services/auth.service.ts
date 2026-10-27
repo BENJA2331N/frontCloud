@@ -58,6 +58,30 @@ export class AuthService {
     return roles.map(r => r.toUpperCase());
   }
 
+  /** Scopes (claim 'scp') presentes en el idToken; vacío si el idToken no los incluye. */
+  getScopes(): string[] {
+    const account = this.getActiveAccount() || this.msalService.instance.getAllAccounts()[0];
+    const scp: string = (account?.idTokenClaims as any)?.scp || '';
+    return scp ? scp.split(' ').filter(s => !!s) : [];
+  }
+
+  /** Scopes concedidos en el accessToken de la API protegida (obtenidos silenciosamente con MSAL). */
+  async getAccessTokenScopes(): Promise<string[]> {
+    const account = this.getActiveAccount() || this.msalService.instance.getAllAccounts()[0];
+    if (!account) {
+      return [];
+    }
+    try {
+      const result = await this.msalService.instance.acquireTokenSilent({
+        account,
+        scopes: environment.azure.protectedResourceScopes
+      });
+      return result.scopes || [];
+    } catch {
+      return [];
+    }
+  }
+
   setSimulatedRole(role: string | null): void {
     this.simulatedRole = role;
     if (role) {

@@ -1,0 +1,459 @@
+openapi: 3.0.1
+info:
+  title: Pedidos360 Cloud — API Manager (Azure APIM & BFF)
+  description: >-
+    Especificación OpenAPI 3.0 para Azure API Management (APIM) y BFF Spring Boot.
+    Enruta todas las operaciones hacia los microservicios downstream:
+    - ms-pedidos360-catalogo (puerto 8081 / servicio de catálogo)
+    - ms-pedidos360-ordenes (puerto 8082 / servicio de órdenes)
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: BFF / Gateway Local
+  - url: https://pedidos360-apim.azure-api.net
+    description: Azure API Management Gateway
+
+paths:
+  # ===========================================================================
+  # 1. RUTAS DEL MICROSERVICIO DE CATÁLOGO (ms-pedidos360-catalogo)
+  # ===========================================================================
+  /api/catalog/products:
+    get:
+      summary: Listar productos del catálogo
+      description: Retorna todos los productos activos. Permitido para CLIENTE, OPERADOR, ADMIN.
+      operationId: getCatalogProducts
+      tags:
+        - Catálogo (ms-catalogo)
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Listado de productos obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Crear un nuevo producto
+      description: Da de alta un nuevo producto en el catálogo. Exclusivo para rol ADMIN.
+      operationId: createCatalogProduct
+      tags:
+        - Catálogo (ms-catalogo)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        '201':
+          description: Producto creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /api/catalog/products/{id}:
+    get:
+      summary: Detalle de producto por ID
+      description: Obtiene la información detallada de un producto por su clave primaria.
+      operationId: getCatalogProductById
+      tags:
+        - Catálogo (ms-catalogo)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Detalle del producto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Producto no encontrado
+    put:
+      summary: Modificar producto o stock
+      description: Actualiza precio, descripción o stock. Permitido para ADMIN y OPERADOR.
+      operationId: updateCatalogProduct
+      tags:
+        - Catálogo (ms-catalogo)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        '200':
+          description: Producto actualizado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Producto no encontrado
+    delete:
+      summary: Eliminar producto (Soft-Delete)
+      description: Marca el producto como inactivo. Exclusivo para rol ADMIN.
+      operationId: deleteCatalogProduct
+      tags:
+        - Catálogo (ms-catalogo)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Producto eliminado lógicamente
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ===========================================================================
+  # 2. RUTAS DEL MICROSERVICIO DE ÓRDENES (ms-pedidos360-ordenes)
+  # ===========================================================================
+  /api/orders:
+    get:
+      summary: Listar todas las órdenes del sistema
+      description: Retorna la totalidad de pedidos para auditoría y gestión. Solo OPERADOR y ADMIN.
+      operationId: getAllOrders
+      tags:
+        - Órdenes (ms-ordenes)
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Listado total de órdenes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      summary: Crear nuevo pedido
+      description: Registra un pedido con estado inicial CREADO. Permitido para CLIENTE y ADMIN.
+      operationId: createOrder
+      tags:
+        - Órdenes (ms-ordenes)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+      responses:
+        '201':
+          description: Pedido registrado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/orders/mine:
+    get:
+      summary: Listar pedidos propios del cliente
+      description: Retorna únicamente los pedidos asociados al usuario autenticado (claim oid / sub).
+      operationId: getMyOrders
+      tags:
+        - Órdenes (ms-ordenes)
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Listado de pedidos propios del cliente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/orders/{id}:
+    get:
+      summary: Detalle de pedido por ID
+      description: Consulta el detalle completo de una orden específica. Permitido para OPERADOR y ADMIN.
+      operationId: getOrderById
+      tags:
+        - Órdenes (ms-ordenes)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Detalle del pedido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Pedido no encontrado
+
+  /api/orders/{id}/status:
+    patch:
+      summary: Avanzar estado del pedido
+      description: >-
+        Avanza el estado del pedido según la máquina de estados:
+        CREADO -> ACEPTADO -> EN_PREPARACION -> DESPACHADO -> ENTREGADO (o CANCELADO).
+        Al pasar a ACEPTADO, descuenta automáticamente el stock en ms-catalogo.
+        Permitido para OPERADOR y ADMIN.
+      operationId: updateOrderStatus
+      tags:
+        - Órdenes (ms-ordenes)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusUpdateRequest'
+      responses:
+        '200':
+          description: Estado actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          description: Transición de estado no válida
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Pedido no encontrado
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token JWT emitido por Microsoft Entra ID (Azure AD).
+
+  responses:
+    Unauthorized:
+      description: Token JWT ausente, expirado o con issuer/aud inválido (HTTP 401).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Acceso denegado. El rol en el token no tiene permisos para esta ruta (HTTP 403).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    ProductRequest:
+      type: object
+      required:
+        - nombre
+        - precio
+        - stock
+      properties:
+        nombre:
+          type: string
+          example: "Laptop Dell Precision 5570"
+        descripcion:
+          type: string
+          example: "Intel i7, 32GB RAM, 1TB SSD"
+        precio:
+          type: number
+          format: double
+          example: 1450000
+        stock:
+          type: integer
+          example: 12
+
+    ProductResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        nombre:
+          type: string
+          example: "Laptop Dell Precision 5570"
+        descripcion:
+          type: string
+          example: "Intel i7, 32GB RAM, 1TB SSD"
+        precio:
+          type: number
+          format: double
+          example: 1450000
+        stock:
+          type: integer
+          example: 12
+        activo:
+          type: boolean
+          example: true
+
+    OrderItemRequest:
+      type: object
+      required:
+        - productoId
+        - cantidad
+        - precioUnitario
+      properties:
+        productoId:
+          type: integer
+          format: int64
+          example: 1
+        cantidad:
+          type: integer
+          example: 2
+        precioUnitario:
+          type: number
+          format: double
+          example: 1450000
+
+    OrderRequest:
+      type: object
+      required:
+        - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItemRequest'
+
+    StatusUpdateRequest:
+      type: object
+      required:
+        - estado
+      properties:
+        estado:
+          type: string
+          enum: [CREADO, ACEPTADO, EN_PREPARACION, DESPACHADO, ENTREGADO, CANCELADO]
+          example: "ACEPTADO"
+
+    OrderResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 101
+        clienteId:
+          type: string
+          example: "cli-oid-999"
+        estado:
+          type: string
+          example: "ACEPTADO"
+        fechaCreacion:
+          type: string
+          format: date-time
+          example: "2026-10-01T12:00:00"
+        total:
+          type: number
+          format: double
+          example: 2900000
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+                example: 1
+              productoId:
+                type: integer
+                format: int64
+                example: 1
+              cantidad:
+                type: integer
+                example: 2
+              precioUnitario:
+                type: number
+                format: double
+                example: 1450000
+
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          example: "2026-10-01T12:00:00"
+        status:
+          type: integer
+          example: 401
+        error:
+          type: string
+          example: "Unauthorized"
+        message:
+          type: string
+          example: "Token de autenticación inválido, expirado o ausente."
+        path:
+          type: string
+          example: "/api/catalog/products"

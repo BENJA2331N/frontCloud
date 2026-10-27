@@ -1,0 +1,385 @@
+{
+	"info": {
+		"_postman_id": "pedidos360-ep1-evidencias-2026",
+		"name": "Pedidos360 Cloud — Evidencias EP1 (200, 401, 403 & Roles)",
+		"description": "Colección completa de pruebas para la Evaluación Parcial 1:\n- Validación JWT (401 Unauthorized sin token o con token inválido)\n- Control de Acceso RBAC (403 Forbidden para roles no autorizados)\n- Respuestas 200/201/204 para roles autorizados (ADMIN, OPERADOR, CLIENTE)\n- Verificación de cada endpoint del BFF",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "tokenAdmin",
+			"value": "",
+			"type": "string",
+			"description": "Access Token JWT emitido por Microsoft Entra ID con rol ADMIN"
+		},
+		{
+			"key": "tokenOperador",
+			"value": "",
+			"type": "string",
+			"description": "Access Token JWT emitido por Microsoft Entra ID con rol OPERADOR"
+		},
+		{
+			"key": "tokenCliente",
+			"value": "",
+			"type": "string",
+			"description": "Access Token JWT emitido por Microsoft Entra ID con rol CLIENTE"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Validación JWT (401 Unauthorized)",
+			"description": "Peticiones sin token o con token malformado/expirado. El backend responde JSON estructurado con status 401.",
+			"item": [
+				{
+					"name": "1.1 GET Catálogo sin Token -> 401",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/catalog/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "catalog", "products"]
+						}
+					}
+				},
+				{
+					"name": "1.2 POST Catálogo sin Token -> 401",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Teclado Gamer\",\n  \"precio\": 29990,\n  \"stock\": 10\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/catalog/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "catalog", "products"]
+						}
+					}
+				},
+				{
+					"name": "1.3 GET Todas las Órdenes sin Token -> 401",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders"]
+						}
+					}
+				},
+				{
+					"name": "1.4 GET Mis Pedidos sin Token -> 401",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/mine",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "mine"]
+						}
+					}
+				},
+				{
+					"name": "1.5 POST Crear Pedido sin Token -> 401",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"items\": [\n    {\n      \"productoId\": 1,\n      \"cantidad\": 2,\n      \"precioUnitario\": 1450000\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders"]
+						}
+					}
+				},
+				{
+					"name": "1.6 PATCH Cambiar Estado sin Token -> 401",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"estado\": \"ACEPTADO\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/1/status",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "1", "status"]
+						}
+					}
+				},
+				{
+					"name": "1.7 GET con Token Inválido o Falso -> 401",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer token_falso_invalido_ep1" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/catalog/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "catalog", "products"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Control de Acceso RBAC (403 Forbidden)",
+			"description": "Peticiones con token válido pero cuyo rol no posee permisos para la operación. El backend responde JSON estructurado con status 403.",
+			"item": [
+				{
+					"name": "2.1 CLIENTE intenta crear Producto -> 403 Forbidden",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{tokenCliente}}" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Monitor Pro\",\n  \"precio\": 350000,\n  \"stock\": 5\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/catalog/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "catalog", "products"]
+						}
+					}
+				},
+				{
+					"name": "2.2 OPERADOR intenta crear Producto -> 403 Forbidden",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{tokenOperador}}" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Mouse Inalámbrico\",\n  \"precio\": 45000,\n  \"stock\": 20\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/catalog/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "catalog", "products"]
+						}
+					}
+				},
+				{
+					"name": "2.3 OPERADOR intenta eliminar Producto -> 403 Forbidden",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{tokenOperador}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/catalog/products/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "catalog", "products", "1"]
+						}
+					}
+				},
+				{
+					"name": "2.4 CLIENTE intenta listar todas las Órdenes -> 403 Forbidden",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{tokenCliente}}" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders"]
+						}
+					}
+				},
+				{
+					"name": "2.5 CLIENTE intenta avanzar estado de Orden -> 403 Forbidden",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{tokenCliente}}" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"estado\": \"DESPACHADO\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/1/status",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "1", "status"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Peticiones Autorizadas (200, 201, 204 OK)",
+			"description": "Peticiones ejecutadas con el rol y token correctos.",
+			"item": [
+				{
+					"name": "3.1 Consultar Catálogo (CLIENTE/OPERADOR/ADMIN) -> 200 OK",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{tokenCliente}}" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/catalog/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "catalog", "products"]
+						}
+					}
+				},
+				{
+					"name": "3.2 Crear Producto en Catálogo (ADMIN) -> 201 Created",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{tokenAdmin}}" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Laptop Dell Precision 5570\",\n  \"descripcion\": \"Intel i7, 32GB RAM, 1TB SSD\",\n  \"precio\": 1450000,\n  \"stock\": 12\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/catalog/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "catalog", "products"]
+						}
+					}
+				},
+				{
+					"name": "3.3 Modificar Stock / Producto (OPERADOR/ADMIN) -> 200 OK",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{tokenOperador}}" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Laptop Dell Precision 5570\",\n  \"descripcion\": \"Intel i7, 32GB RAM, 1TB SSD\",\n  \"precio\": 1450000,\n  \"stock\": 15\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/catalog/products/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "catalog", "products", "1"]
+						}
+					}
+				},
+				{
+					"name": "3.4 Eliminar Producto (ADMIN) -> 204 No Content",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{tokenAdmin}}" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/catalog/products/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "catalog", "products", "1"]
+						}
+					}
+				},
+				{
+					"name": "3.5 Consultar Mis Pedidos (CLIENTE) -> 200 OK",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{tokenCliente}}" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/mine",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "mine"]
+						}
+					}
+				},
+				{
+					"name": "3.6 Crear Pedido (CLIENTE) -> 200/201 OK",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{tokenCliente}}" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"items\": [\n    {\n      \"productoId\": 1,\n      \"cantidad\": 1,\n      \"precioUnitario\": 1450000\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders"]
+						}
+					}
+				},
+				{
+					"name": "3.7 Listar Todas las Órdenes (OPERADOR/ADMIN) -> 200 OK",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{tokenOperador}}" },
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders"]
+						}
+					}
+				},
+				{
+					"name": "3.8 Avanzar Estado del Pedido (OPERADOR) -> 200 OK",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Authorization", "value": "Bearer {{tokenOperador}}" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"estado\": \"ACEPTADO\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/1/status",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "1", "status"]
+						}
+					}
+				}
+			]
+		}
+	]
+}
