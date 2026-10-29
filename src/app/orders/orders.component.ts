@@ -2,8 +2,8 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { OrdersService, Order } from './orders.service';
-import { CatalogService, Product } from '../catalog/catalog.service';
+import { OrdersService, Order } from '../services/orders.service';
+import { CatalogService, Product } from '../services/catalog.service';
 import { AuthService } from '../services/auth.service';
 
 @Component({

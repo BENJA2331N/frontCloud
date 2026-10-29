@@ -2,7 +2,7 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { CatalogService, Product } from './catalog.service';
+import { CatalogService, Product } from '../services/catalog.service';
 import { AuthService } from '../services/auth.service';
 
 @Component({
